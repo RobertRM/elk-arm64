@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  es01:
+    image: "robertrm/docker-elasticsearch-arm64:7.10.1" 
+    environment:
+      - node.name=es01
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - network.host=0.0.0.0
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic-experimental
+  kib01:
+    image: "robertrm/docker-kibana-arm64:7.10.1" 
+    environment:
+        SERVERNAME: localhost
+        ELASTICSEARCH_URL: http://es01:9200
+        ELASTICSEARCH_HOSTS: http://es01:9200
+    networks:
+      - elastic-experimental
+    ports:
+      - "5601:5601"
+  ls01:
+    image: "robertrm/docker-logstash-arm64:7.10.1" 
+    environment:
+       - "ES_JAVA_OPTS=-Xmx512m -Xms512m"
+       - monitoring.elasticsearch.hosts=http://es01:9200
+    networks:
+      - elastic
+    ports:
+      - 5044:5044
+      - 9600:9600
+
+volumes:
+  data01:
+    driver: local
+
+networks:
+  elastic-experimental:
+    driver: overlay
