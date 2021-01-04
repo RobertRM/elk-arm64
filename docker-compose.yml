@@ -13,7 +13,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data01:/usr/share/elasticsearch/data
+      - "./docker-src/elasticsearch/data:/usr/share/elasticsearch/data"
     ports:
       - 9200:9200
     networks:
@@ -28,6 +28,8 @@ services:
       - elastic-experimental
     ports:
       - "5601:5601"
+    volumes:
+      - "./docker-src/kibana/config/kibana.yml:/etc/kibana/kibana.yml"
   ls01:
     image: "robertrm/docker-logstash-arm64:7.10.1" 
     environment:
@@ -38,6 +40,9 @@ services:
     ports:
       - 5044:5044
       - 9600:9600
+    volumes:
+      - "./docker-src/logstash/config/logstash.yml:/etc/logstash/logstash.yml"
+      - "./docker-src/logstash/config/pipelines.yml:/etc/logstash/pipelines.yml"
 
 volumes:
   data01:
